@@ -56,12 +56,9 @@ class User(Model, FixtureMixin):
 #### Thats it. You can now use the model as you would any other masoniteorm model. 
 
 ## Important
-Fixture data is semi-permanent. Every time you modify the fixture model file the data in its database is deleted. If you never modify the model file then the data remains in place. Which means you can even store additional data in fixtures. Personally I would avoid doing this. 
-
+If the number of rows defined in the `rows` attribute or `get_rows` property of the fixture model class exceeds the number of rows stored in the actual database cache for the fixture, the fixture will reset the database table and reseed the fixture data.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ```
-
-This README now provides a more thorough description of the features offered by the `masonite-fixtures` package and includes examples demonstrating the usage of both `get_rows` and `rows`.
