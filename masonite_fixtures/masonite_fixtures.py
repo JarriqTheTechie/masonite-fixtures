@@ -114,22 +114,14 @@ class FixtureMixin:
 
     def check_data_freshness(self, fixture_model):
         logger.info(f"Checking [{self.__resource__}] Fixture Data Freshness")
-        cache_path = Path(inspect.getfile(fixture_model.__class__)).parent / "fixture-cache"
-        cache_file = cache_path / f"{self.__resource__}.sqlite3"
 
-        # Check if cache file exists
-        if not cache_file.exists():
-            logger.info(f"Cache file does not exist for [{self.__resource__}]")
-            return self
+        rows_in_db = list(QueryBuilder().on(f'{self.__resource__}').table(f'{self.__resource__}').count("*").first().values())[0]
+        try:
+            rows_in_fixture = len(fixture_model.rows)
+        except AttributeError:
+            rows_in_fixture = len(fixture_model.get_rows())
 
-        # Get cache file modification time
-        cache_file_last_updated = cache_file.stat().st_mtime
-
-        # Get model file modification time
-        model_file_last_updated = os.path.getmtime(inspect.getfile(fixture_model.__class__))
-
-        # If the cache file is older than the model file, refresh the data
-        if cache_file_last_updated < model_file_last_updated:
+        if rows_in_db < rows_in_fixture:
             logger.info(f"Cache file is older than model file. Refreshing data for [{self.__resource__}]")
             QueryBuilder().on(f'{self.__resource__}').table(f'{self.__resource__}').delete()
             self.migrate(self, fixture_model)
