@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="masonite_fixtures",
-    version="0.1.7c3",
+    name="masonite-fixtures",
+    version="0.0.2",
     author="Jarriq Rolle",
     author_email="jrolle@bnbbahamas.com",
-    description="A package that extends the flask webframework in a very opinionated way.",
+    description="Package provides utilities for managing fixture data python applications. It offers a convenient way to populate database tables with predefined data.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/JarriqTheTechie/flask_orphus",
+    url="https://github.com/JarriqTheTechie/masonite-fixtures",
     packages=find_packages(),
     include_package_data=True,
     classifiers=[
@@ -21,8 +21,6 @@ setup(
     ],
     python_requires='>=3.9',
     install_requires=[
-        'flask',
-        "python-dotenv",
         "masonite-orm"
     ],
 )
