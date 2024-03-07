@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="masonite-fixtures",
-    version="0.0.3",
+    version="0.0.5",
     author="Jarriq Rolle",
     author_email="jrolle@bnbbahamas.com",
     description="Package provides utilities for managing fixture data python applications. It offers a convenient way to populate database tables with predefined data.",

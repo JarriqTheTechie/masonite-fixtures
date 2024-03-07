@@ -21,23 +21,26 @@ class FixtureMixin:
     def boot_FixtureMixin(self, builder: QueryBuilder):
         pluralized_lowercase_name = inflection.pluralize(builder.get_table_name()).lower()
         self.__connection__, self.__table__, self.__resource__ = pluralized_lowercase_name, pluralized_lowercase_name, pluralized_lowercase_name
-        logger.info(f"Initializing [{self.__resource__}] Fixture")
-        fixture_model = builder._model
-        DB = load_config().DB
-        DATABASES = DB.get_connection_details()
+        #logger.info(f"Initializing [{self.__resource__}] Fixture")
+        self.fixture_model = builder._model
+        if self.fixture_model:
+            DB = load_config().DB
+            DATABASES = DB.get_connection_details()
 
-        cache_path = Path(inspect.getfile(fixture_model.__class__)).parent / "fixture-cache"
-        cache_path.mkdir(exist_ok=True)
-        cache_file = cache_path / f"{self.__resource__}.sqlite3"
-        self.cache_file_dir = cache_path / cache_file
+            cache_path = Path(inspect.getfile(self.fixture_model.__class__)).parent / "fixture-cache"
+            cache_path.mkdir(exist_ok=True)
+            cache_file = cache_path / f"{self.__resource__}.sqlite3"
+            self.cache_file_dir = cache_path / cache_file
 
-        self.connection(self, pluralized_lowercase_name, fixture_model, cache_file, databases=DATABASES, db=DB)
-        self.builder = QueryBuilder().on(f'{self.__resource__}').table(f'{self.__resource__}')
-        return self.builder
+            self.connection(self, pluralized_lowercase_name, self.fixture_model, cache_file, databases=DATABASES, db=DB)
+            self.builder = QueryBuilder().on(f'{self.__resource__}').table(f'{self.__resource__}')
+            return self.builder
+
+
 
     @staticmethod
     def connection(self, table: str, fixture_model, cache_file, databases, db) -> Any:
-        logger.info(f"Connecting to [{table}] Fixture")
+        #logger.info(f"Connecting to [{table}] Fixture")
         # Load connection resolver and get current dictionary containing connections
 
         if not cache_file.exists():
@@ -59,7 +62,7 @@ class FixtureMixin:
         return self
 
     def create_table(self, fixture_model):
-        logger.info(f"Creating [{self.__resource__}] Fixture Table")
+        #logger.info(f"Creating [{self.__resource__}] Fixture Table")
         table_name: str = self.__resource__
 
         create_table: Migration = Migration(connection=table_name)
@@ -96,7 +99,7 @@ class FixtureMixin:
             return None
 
     def migrate(self, fixture_model):
-        logger.info(f"Migrating [{self.__resource__}] Fixture Data")
+        #logger.info(f"Migrating [{self.__resource__}] Fixture Data")
         if getattr(fixture_model, "get_rows", None):
             QueryBuilder().on(f'{self.__resource__}').table(f'{self.__resource__}').bulk_create(
                 fixture_model.get_rows()
@@ -113,7 +116,7 @@ class FixtureMixin:
             f"[rows] attribute or [get_rows] method must be defined on the fixture model [{self.__class__.__name__}]")
 
     def check_data_freshness(self, fixture_model):
-        logger.info(f"Checking [{self.__resource__}] Fixture Data Freshness")
+        #logger.info(f"Checking [{self.__resource__}] Fixture Data Freshness")
 
         rows_in_db = list(QueryBuilder().on(f'{self.__resource__}').table(f'{self.__resource__}').count("*").first().values())[0]
         try:
@@ -122,7 +125,6 @@ class FixtureMixin:
             rows_in_fixture = len(fixture_model.get_rows())
 
         if rows_in_db < rows_in_fixture:
-            logger.info(f"Cache file is older than model file. Refreshing data for [{self.__resource__}]")
             QueryBuilder().on(f'{self.__resource__}').table(f'{self.__resource__}').delete()
             self.migrate(self, fixture_model)
 
