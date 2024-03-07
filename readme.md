@@ -1,6 +1,6 @@
 # Masonite Fixtures
 
-The `masonite-fixtures` package provides utilities for managing fixture data python applications. It offers a convenient way to populate database tables with predefined data.
+The `masonite-fixtures` package provides utilities for managing fixture data in python applications. It offers a convenient way to populate database tables with predefined data.
 
 ## Installation
 
